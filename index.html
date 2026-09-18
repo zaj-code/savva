@@ -138,7 +138,9 @@
   .s04 .row-head h2{font-family:'Migra',serif; font-weight:700; font-size:clamp(20px,2.8vw,30px); max-width:14em;}
   .s04 .tiles{display:flex; gap:2px; padding:0 clamp(24px,5vw,60px);}
   .s04 .tiles .placeholder{flex:1; aspect-ratio:3/4;}
-  @media (max-width:700px){.s04 .tiles{flex-direction:column;} .s04 .tiles .placeholder{aspect-ratio:4/3;}}
+  .s04 .tiles .tile-photo{flex:1; aspect-ratio:3/4; overflow:hidden;}
+  .s04 .tiles .tile-photo img{width:100%; height:100%; object-fit:cover; display:block;}
+  @media (max-width:700px){.s04 .tiles{flex-direction:column;} .s04 .tiles .placeholder, .s04 .tiles .tile-photo{aspect-ratio:4/3;}}
 
   /* ---- §05 text list (selection), no images ---- */
   .s05{min-height:100vh; display:flex; flex-direction:column; justify-content:center; padding:clamp(24px,5vw,60px);}
@@ -290,7 +292,7 @@
     <h2 class="reveal">Место работает в темпе города: заходят на пять минут, остаются на пять часов.</h2>
   </div>
   <div class="tiles">
-    <div class="placeholder"><div class="tag">ФОТО: угол зала</div></div>
+    <div class="tile-photo"><img src="foto/703297266_17999611355929325_339184281160575340_n.jpg" alt="" style="object-position:50% 30%;"></div>
     <div class="placeholder"><div class="tag">ФОТО: свет и растения</div></div>
     <div class="placeholder"><div class="tag">ФОТО: деталь стойки</div></div>
   </div>
