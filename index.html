@@ -147,50 +147,15 @@
   .s05{min-height:100vh; display:flex; flex-direction:column; justify-content:center; padding:clamp(24px,5vw,60px);}
   .s05 .clause-num{display:block; margin-bottom:14px;}
   .s05 h2{font-family:'Migra',serif; font-weight:700; font-size:clamp(20px,2.8vw,30px); margin-bottom:34px; max-width:12em;}
-  /* ---- §05 catalog: paged cards + description + request button ---- */
-  .catalog{max-width:640px;}
-  .catalog-viewport{overflow:hidden; border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
-  .catalog-track{
-    display:flex; transition:transform .5s cubic-bezier(.65,0,.35,1);
-  }
-  .catalog-card{
-    flex:0 0 100%; display:flex; align-items:baseline; gap:16px;
-    padding:28px 0; background:none; border:none; text-align:left; cursor:pointer;
-    font-family:inherit; color:inherit;
-  }
-  .catalog-card .n{font-family:'Fragment Mono',monospace; font-size:12px; color:var(--muted);}
-  .catalog-card .label{font-family:'Migra',serif; font-weight:700; font-size:clamp(18px,2.4vw,24px);}
-
-  .catalog-nav{display:flex; align-items:center; justify-content:space-between; padding:14px 0 0;}
-  .catalog-nav .catalog-prev, .catalog-nav .catalog-next{
-    font-family:'Fragment Mono',monospace; font-size:11px; background:none;
-    border:1px solid var(--ink); padding:8px 14px; cursor:pointer; color:var(--ink);
-  }
-  .catalog-nav .catalog-prev:disabled, .catalog-nav .catalog-next:disabled{opacity:0.3; cursor:default;}
-  .catalog-dots{display:flex; gap:8px;}
-  .catalog-dots button{
-    width:8px; height:8px; border:1px solid var(--ink); background:transparent; padding:0; cursor:pointer;
-  }
-  .catalog-dots button.active{background:var(--accent); border-color:var(--accent);}
-
-  .catalog-detail{margin-top:22px; min-height:110px;}
-  .catalog-desc{font-size:15px; line-height:1.7; color:var(--muted); max-width:34em; margin:0 0 20px;}
-
-  .catalog-cta{
-    position:relative; display:inline-flex; align-items:center; overflow:hidden;
-    border:1px solid var(--ink); padding:14px 24px; text-decoration:none;
-  }
-  .catalog-cta .cta-fill{
-    position:absolute; inset:0; background:var(--accent);
-    transform:scaleX(0); transform-origin:left;
-    transition:transform .45s cubic-bezier(.65,0,.35,1);
-  }
-  .catalog-cta:hover .cta-fill, .catalog-cta:focus-visible .cta-fill{transform:scaleX(1);}
-  .catalog-cta .cta-text{
-    position:relative; z-index:1; font-family:'Fragment Mono',monospace; font-size:12px;
-    color:var(--ink); transition:color .45s ease;
-  }
-  .catalog-cta:hover .cta-text, .catalog-cta:focus-visible .cta-text{color:var(--cream);}
+  /* ---- §05 menu grid: photo + name, no prices ---- */
+  .menu-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:28px; max-width:800px;}
+  .menu-item{display:flex; flex-direction:column; gap:14px;}
+  .menu-photo{aspect-ratio:1/1; overflow:hidden;}
+  .menu-photo img{width:100%; height:100%; object-fit:cover; display:block;}
+  .menu-photo.placeholder{align-items:flex-end;}
+  .menu-name{font-family:'Migra',serif; font-weight:700; font-size:16px;}
+  .s05 .fill-btn{margin-top:36px;}
+  @media (max-width:640px){ .menu-grid{grid-template-columns:1fr 1fr; gap:20px;} .menu-item:nth-child(3){grid-column:1 / -1;} }
 
   /* ---- §06 quiet centered block (visit) ---- */
   .s06{min-height:70vh; display:flex; align-items:center; justify-content:center; background:var(--accent);}
@@ -302,44 +267,25 @@
   <span class="clause-num reveal">§05</span>
   <h2 class="reveal">В работе сегодня.</h2>
 
-  <div class="catalog reveal">
-    <div class="catalog-viewport">
-      <div class="catalog-track">
-        <button class="catalog-card" data-index="0" type="button">
-          <span class="n">01</span>
-          <span class="label">Эспрессо и фильтр</span>
-        </button>
-        <button class="catalog-card" data-index="1" type="button">
-          <span class="n">02</span>
-          <span class="label">Напитки со льдом</span>
-        </button>
-        <button class="catalog-card" data-index="2" type="button">
-          <span class="n">03</span>
-          <span class="label">Сезонное блюдо дня</span>
-        </button>
-      </div>
+  <div class="menu-grid reveal">
+    <div class="menu-item">
+      <div class="menu-photo"><img src="foto/631103935_17987349539929325_8904957824225404027_n.jpg" alt="" style="object-position:50% 35%;"></div>
+      <div class="menu-name">Эспрессо и фильтр</div>
     </div>
-
-    <div class="catalog-nav">
-      <button class="catalog-prev" type="button" aria-label="Предыдущая карточка">Пред.</button>
-      <div class="catalog-dots">
-        <button data-index="0" type="button" aria-label="Карточка 1"></button>
-        <button data-index="1" type="button" aria-label="Карточка 2"></button>
-        <button data-index="2" type="button" aria-label="Карточка 3"></button>
-      </div>
-      <button class="catalog-next" type="button" aria-label="Следующая карточка">След.</button>
+    <div class="menu-item">
+      <div class="menu-photo placeholder"><div class="tag">ФОТО: напитки со льдом</div></div>
+      <div class="menu-name">Напитки со льдом</div>
     </div>
-
-    <div class="catalog-detail">
-      <p class="catalog-desc" data-index="0">Обжарка ротируется по сезону, метод варки подбирается под конкретное зерно.</p>
-      <p class="catalog-desc" data-index="1" hidden>Правильно работают всё лето: от классического айс-латте до фильтр-кофе со льдом.</p>
-      <p class="catalog-desc" data-index="2" hidden>Меняется без предупреждения. Спросите на месте, что сегодня.</p>
-      <a class="catalog-cta" href="https://www.instagram.com/savva_cafe/" target="_blank" rel="noopener">
-        <span class="cta-fill"></span>
-        <span class="cta-text">Написать в Instagram</span>
-      </a>
+    <div class="menu-item">
+      <div class="menu-photo placeholder"><div class="tag">ФОТО: сезонное блюдо дня</div></div>
+      <div class="menu-name">Сезонное блюдо дня</div>
     </div>
   </div>
+
+  <a class="fill-btn reveal" href="https://www.instagram.com/savva_cafe/" target="_blank" rel="noopener">
+    <span class="fill"></span>
+    <span class="label">Написать в Instagram</span>
+  </a>
 </section>
 
 <section class="s06" id="s06">
@@ -410,49 +356,6 @@
   try{ savedVariant = localStorage.getItem('savva-hero-photo'); }catch(e){}
   if(savedVariant) setHeroVariant(savedVariant);
   updateHeroDive();
-
-  /* §05 catalog: paged cards, description + request button underneath */
-  (function(){
-    const track = document.querySelector('.catalog-track');
-    const cards = document.querySelectorAll('.catalog-card');
-    const dots = document.querySelectorAll('.catalog-dots button');
-    const descs = document.querySelectorAll('.catalog-desc');
-    const prevBtn = document.querySelector('.catalog-prev');
-    const nextBtn = document.querySelector('.catalog-next');
-    if(!track) return;
-
-    let active = 0;
-    const count = cards.length;
-
-    function render(){
-      track.style.transform = `translateX(${active * -100}%)`;
-      dots.forEach(d=>d.classList.toggle('active', Number(d.dataset.index)===active));
-      descs.forEach(p=>{ p.hidden = Number(p.dataset.index)!==active; });
-      prevBtn.disabled = active===0;
-      nextBtn.disabled = active===count-1;
-    }
-
-    function goTo(i){
-      active = Math.min(Math.max(i,0), count-1);
-      render();
-    }
-
-    cards.forEach(c=>c.addEventListener('click', ()=>goTo(Number(c.dataset.index))));
-    dots.forEach(d=>d.addEventListener('click', ()=>goTo(Number(d.dataset.index))));
-    prevBtn.addEventListener('click', ()=>goTo(active-1));
-    nextBtn.addEventListener('click', ()=>goTo(active+1));
-
-    let touchStartX = null;
-    track.addEventListener('touchstart', e=>{ touchStartX = e.touches[0].clientX; }, {passive:true});
-    track.addEventListener('touchend', e=>{
-      if(touchStartX===null) return;
-      const dx = e.changedTouches[0].clientX - touchStartX;
-      if(Math.abs(dx) > 40) goTo(active + (dx < 0 ? 1 : -1));
-      touchStartX = null;
-    }, {passive:true});
-
-    render();
-  })();
 </script>
 
 </body>
