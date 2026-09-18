@@ -202,6 +202,7 @@
   /* ---- §07 full-bleed close ---- */
   .s07{position:relative; min-height:100vh; display:flex; align-items:flex-end;}
   .s07 .placeholder{position:absolute; inset:0;}
+  .s07 .s07-photo{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
   .s07 .veil{position:absolute; inset:0; background:linear-gradient(0deg, rgba(16,18,16,0.75), rgba(16,18,16,0.05) 55%);}
   .s07 .content{position:relative; width:100%; padding:clamp(24px,5vw,60px); display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:24px;}
   .s07 h2{font-family:'Migra',serif; font-weight:700; color:#F1F0EA; font-size:clamp(24px,3.6vw,40px); max-width:12em;}
@@ -293,7 +294,7 @@
   <div class="tiles">
     <div class="tile-photo"><img src="foto/703297266_17999611355929325_339184281160575340_n.jpg" alt="" style="object-position:50% 30%;"></div>
     <div class="tile-photo"><img src="foto/623779361_18089380357843904_3614513411808768625_n.jpg" alt="" style="object-position:35% 45%;"></div>
-    <div class="placeholder"><div class="tag">ФОТО: деталь стойки</div></div>
+    <div class="tile-photo"><img src="foto/600854154_17981589272929325_7405325310326216018_n.jpg" alt="" style="object-position:55% 40%;"></div>
   </div>
 </section>
 
@@ -350,9 +351,7 @@
 </section>
 
 <section class="s07" id="s07">
-  <div class="placeholder">
-    <div class="tag">ФОТО: витрина или вход в кофейню в сумерках</div>
-  </div>
+  <img class="s07-photo" src="foto/799848426_18015550742929325_2004793924333812957_n.jpg" alt="" style="object-position:55% 30%;">
   <div class="veil"></div>
   <div class="content">
     <h2 class="reveal">Каждое утро начинается заново. Это утро начинается в SAVVA.</h2>
