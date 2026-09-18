@@ -89,6 +89,31 @@
     transform-origin:center center; will-change:transform;
   }
   .hero .image-col img.active{opacity:1;}
+
+  /* ---- steam rising over the cup ---- */
+  .hero .steam{
+    position:absolute; left:55%; top:19%; width:1px; height:1px; z-index:2; pointer-events:none;
+  }
+  .hero .steam span{
+    position:absolute; bottom:0; left:0;
+    width:16px; height:55px;
+    background:radial-gradient(ellipse at center, rgba(255,255,255,0.6), rgba(255,255,255,0) 72%);
+    border-radius:50%;
+    filter:blur(3px);
+    opacity:0;
+    animation:steam-rise 4.5s ease-in infinite;
+  }
+  .hero .steam span:nth-child(1){ left:-14px; animation-delay:0s; }
+  .hero .steam span:nth-child(2){ left:0px; animation-delay:1.5s; }
+  .hero .steam span:nth-child(3){ left:12px; animation-delay:3s; }
+  @keyframes steam-rise{
+    0%{ transform:translateY(0) translateX(0) scaleX(1); opacity:0; filter:blur(2px); }
+    15%{ opacity:0.55; }
+    50%{ transform:translateY(-42px) translateX(6px) scaleX(1.3); opacity:0.35; filter:blur(4px); }
+    100%{ transform:translateY(-90px) translateX(-4px) scaleX(1.6); opacity:0; filter:blur(7px); }
+  }
+  @media (prefers-reduced-motion: reduce){ .hero .steam{display:none;} }
+
   @media (max-width:760px){.hero .split{flex-direction:column;} .hero .image-col{min-height:56vh;}}
 
   /* ---- settings panel (hero photo switcher) ---- */
@@ -226,6 +251,7 @@
       <img data-variant="01" class="active" src="foto/626292371_18057275822342849_6177173044966868989_n.jpg" style="object-position:62% 60%;" alt="">
       <img data-variant="02" src="foto/600854154_17981589272929325_7405325310326216018_n.jpg" style="object-position:58% 45%;" alt="">
       <img data-variant="03" src="foto/623352790_18067923083207509_1092006561960030952_n.jpg" style="object-position:50% 55%;" alt="">
+      <div class="steam" aria-hidden="true"><span></span><span></span><span></span></div>
     </div>
   </div>
 </section>
