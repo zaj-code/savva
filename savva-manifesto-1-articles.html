@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SAVVA</title>
+<link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=migra@700&f[]=switzer@400,500,600&f[]=fragment-mono@400,500&display=swap">
+<style>
+  :root{
+    --bg:#F1F0EA;
+    --ink:#101210;
+    --accent:#2B3324;
+    --cream:#F1F0EA;
+    --muted:rgba(16,18,16,0.55);
+    --line:rgba(16,18,16,0.14);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:'Switzer',sans-serif;}
+  h1,h2{margin:0;}
+  section[id]{scroll-margin-top:64px;}
+
+  /* ---- top nav ---- */
+  .topnav{
+    position:fixed; top:0; left:0; right:0; z-index:150;
+    display:flex; align-items:center; justify-content:space-between;
+    height:60px; padding:0 clamp(20px,4vw,40px);
+    background:rgba(241,240,234,0.82); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .topnav-mark{font-family:'Migra',serif; font-weight:700; font-size:17px; color:var(--ink); text-decoration:none;}
+  .topnav-links{display:flex; gap:clamp(14px,2.5vw,28px);}
+  .topnav-links a{font-family:'Fragment Mono',monospace; font-size:11px; color:var(--ink); text-decoration:none; opacity:0.7;}
+  .topnav-links a:hover{opacity:1;}
+  .topnav-cta{
+    font-family:'Fragment Mono',monospace; font-size:11px; color:var(--ink);
+    border:1px solid var(--ink); padding:8px 14px; text-decoration:none; white-space:nowrap;
+  }
+  @media (max-width:640px){ .topnav-links{display:none;} }
+
+  /* ---- reusable fill button (shared with catalog cta) ---- */
+  .fill-btn{
+    position:relative; display:inline-flex; align-items:center; overflow:hidden;
+    border:1px solid var(--ink); padding:13px 22px; text-decoration:none; width:fit-content;
+  }
+  .fill-btn .fill{
+    position:absolute; inset:0; background:var(--accent);
+    transform:scaleX(0); transform-origin:left;
+    transition:transform .45s cubic-bezier(.65,0,.35,1);
+  }
+  .fill-btn:hover .fill, .fill-btn:focus-visible .fill{transform:scaleX(1);}
+  .fill-btn .label{
+    position:relative; z-index:1; font-family:'Fragment Mono',monospace; font-size:12px;
+    color:var(--ink); transition:color .45s ease;
+  }
+  .fill-btn:hover .label, .fill-btn:focus-visible .label{color:var(--cream);}
+  .hero .fill-btn{margin-top:22px;}
+
+  .placeholder{
+    background-color:#DCDACC;
+    background-image:repeating-linear-gradient(135deg, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 1px, transparent 1px, transparent 14px);
+    display:flex; align-items:flex-end; padding:14px;
+  }
+  .placeholder .tag{font-family:'Fragment Mono',monospace; font-size:11px; line-height:1.5; color:var(--ink); opacity:0.6; max-width:320px;}
+  .placeholder.dark{background-color:#171a14;}
+  .placeholder.dark .tag{color:#eae6da; opacity:0.5;}
+
+  .reveal{opacity:0; transform:translateY(18px); transition:opacity .9s ease, transform .9s ease;}
+  .in-view .reveal, .reveal.in-view{opacity:1; transform:translateY(0);}
+
+  /* ---- hero (unchanged) ---- */
+  .hero{min-height:100vh; display:flex;}
+  .hero .split{display:flex; width:100%;}
+  .hero .text-col{flex:1.1; padding:clamp(20px,4vw,56px); display:flex; flex-direction:column; justify-content:center;}
+  .hero .clause-num{font-family:'Fragment Mono',monospace; font-size:12px; opacity:0.5; margin-bottom:18px;}
+  .hero .clause-block{
+    background:var(--accent); color:var(--cream);
+    padding:22px 26px; display:inline-block; width:fit-content;
+    transform-origin:left; transform:scaleX(0);
+    transition:transform .9s cubic-bezier(.6,0,.2,1);
+  }
+  .hero.in-view .clause-block{transform:scaleX(1);}
+  .hero h1{font-family:'Migra',serif; font-weight:700; font-size:clamp(26px,4vw,44px); line-height:1.15; max-width:11em;}
+  .hero .image-col{flex:0.9; position:relative; overflow:hidden;}
+  .hero .image-col .placeholder{height:100%;}
+  .hero .image-col img{
+    position:absolute; inset:0; width:100%; height:100%;
+    object-fit:cover; opacity:0; transition:opacity .7s ease;
+    transform-origin:center center; will-change:transform;
+  }
+  .hero .image-col img.active{opacity:1;}
+  @media (max-width:760px){.hero .split{flex-direction:column;} .hero .image-col{min-height:56vh;}}
+
+  /* ---- settings panel (hero photo switcher) ---- */
+  .settings-panel{
+    position:fixed; right:16px; bottom:16px; z-index:100;
+    background:var(--bg); border:1px solid var(--line);
+    padding:10px 12px; display:flex; align-items:center; gap:10px;
+  }
+  .settings-panel .label{
+    font-family:'Fragment Mono',monospace; font-size:11px; color:var(--muted);
+  }
+  .settings-panel .opts{display:flex; gap:6px;}
+  .settings-panel button{
+    width:28px; height:28px; border:1px solid var(--ink); background:transparent;
+    color:var(--ink); font-family:'Fragment Mono',monospace; font-size:11px; cursor:pointer;
+  }
+  .settings-panel button.active{background:var(--accent); color:var(--cream); border-color:var(--accent);}
+
+  /* ---- shared clause numbering ---- */
+  .clause-num{font-family:'Fragment Mono',monospace; font-size:12px; opacity:0.5;}
+
+  /* ---- §02 full-bleed statement ---- */
+  .s02{position:relative; min-height:100vh; display:flex; align-items:center; justify-content:center;}
+  .s02 .s02-photo{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
+  .s02 .veil{position:absolute; inset:0; background:linear-gradient(180deg, rgba(16,18,16,0.4), rgba(16,18,16,0.62));}
+  .s02 .content{position:relative; text-align:center; padding:0 24px; max-width:820px;}
+  .s02 .clause-num{color:#eae6da; opacity:0.7; margin-bottom:16px; display:block;}
+  .s02 h2{font-family:'Migra',serif; font-weight:700; color:#F1F0EA; font-size:clamp(26px,4.5vw,46px); line-height:1.25;}
+
+  /* ---- §03 mirrored split, outline block ---- */
+  .s03{min-height:100vh; display:flex;}
+  .s03 .split{display:flex; width:100%; flex-direction:row-reverse;}
+  .s03 .text-col{flex:1; padding:clamp(20px,4vw,56px); display:flex; flex-direction:column; justify-content:center;}
+  .s03 .clause-num{margin-bottom:18px; display:block;}
+  .s03 .clause-block{
+    border:1.5px solid var(--ink); padding:20px 24px; width:fit-content;
+  }
+  .s03 h2{font-family:'Migra',serif; font-weight:700; font-size:clamp(22px,3.2vw,34px); line-height:1.25; max-width:11em;}
+  .s03 .image-col{flex:0.9;}
+  .s03 .image-col .placeholder{height:100%;}
+  @media (max-width:760px){.s03 .split{flex-direction:column;}}
+
+  /* ---- §04 image row (place) ---- */
+  .s04{min-height:100vh; display:flex; flex-direction:column; justify-content:center; padding:clamp(24px,5vw,60px) 0;}
+  .s04 .row-head{padding:0 clamp(24px,5vw,60px); margin-bottom:20px;}
+  .s04 .row-head .clause-num{display:block; margin-bottom:14px;}
+  .s04 .row-head h2{font-family:'Migra',serif; font-weight:700; font-size:clamp(20px,2.8vw,30px); max-width:14em;}
+  .s04 .tiles{display:flex; gap:2px; padding:0 clamp(24px,5vw,60px);}
+  .s04 .tiles .placeholder{flex:1; aspect-ratio:3/4;}
+  @media (max-width:700px){.s04 .tiles{flex-direction:column;} .s04 .tiles .placeholder{aspect-ratio:4/3;}}
+
+  /* ---- §05 text list (selection), no images ---- */
+  .s05{min-height:100vh; display:flex; flex-direction:column; justify-content:center; padding:clamp(24px,5vw,60px);}
+  .s05 .clause-num{display:block; margin-bottom:14px;}
+  .s05 h2{font-family:'Migra',serif; font-weight:700; font-size:clamp(20px,2.8vw,30px); margin-bottom:34px; max-width:12em;}
+  /* ---- §05 catalog: paged cards + description + request button ---- */
+  .catalog{max-width:640px;}
+  .catalog-viewport{overflow:hidden; border-top:1px solid var(--line); border-bottom:1px solid var(--line);}
+  .catalog-track{
+    display:flex; transition:transform .5s cubic-bezier(.65,0,.35,1);
+  }
+  .catalog-card{
+    flex:0 0 100%; display:flex; align-items:baseline; gap:16px;
+    padding:28px 0; background:none; border:none; text-align:left; cursor:pointer;
+    font-family:inherit; color:inherit;
+  }
+  .catalog-card .n{font-family:'Fragment Mono',monospace; font-size:12px; color:var(--muted);}
+  .catalog-card .label{font-family:'Migra',serif; font-weight:700; font-size:clamp(18px,2.4vw,24px);}
+
+  .catalog-nav{display:flex; align-items:center; justify-content:space-between; padding:14px 0 0;}
+  .catalog-nav .catalog-prev, .catalog-nav .catalog-next{
+    font-family:'Fragment Mono',monospace; font-size:11px; background:none;
+    border:1px solid var(--ink); padding:8px 14px; cursor:pointer; color:var(--ink);
+  }
+  .catalog-nav .catalog-prev:disabled, .catalog-nav .catalog-next:disabled{opacity:0.3; cursor:default;}
+  .catalog-dots{display:flex; gap:8px;}
+  .catalog-dots button{
+    width:8px; height:8px; border:1px solid var(--ink); background:transparent; padding:0; cursor:pointer;
+  }
+  .catalog-dots button.active{background:var(--accent); border-color:var(--accent);}
+
+  .catalog-detail{margin-top:22px; min-height:110px;}
+  .catalog-desc{font-size:15px; line-height:1.7; color:var(--muted); max-width:34em; margin:0 0 20px;}
+
+  .catalog-cta{
+    position:relative; display:inline-flex; align-items:center; overflow:hidden;
+    border:1px solid var(--ink); padding:14px 24px; text-decoration:none;
+  }
+  .catalog-cta .cta-fill{
+    position:absolute; inset:0; background:var(--accent);
+    transform:scaleX(0); transform-origin:left;
+    transition:transform .45s cubic-bezier(.65,0,.35,1);
+  }
+  .catalog-cta:hover .cta-fill, .catalog-cta:focus-visible .cta-fill{transform:scaleX(1);}
+  .catalog-cta .cta-text{
+    position:relative; z-index:1; font-family:'Fragment Mono',monospace; font-size:12px;
+    color:var(--ink); transition:color .45s ease;
+  }
+  .catalog-cta:hover .cta-text, .catalog-cta:focus-visible .cta-text{color:var(--cream);}
+
+  /* ---- §06 quiet centered block (visit) ---- */
+  .s06{min-height:70vh; display:flex; align-items:center; justify-content:center; background:var(--accent);}
+  .s06 .content{text-align:center; color:var(--cream); padding:24px; max-width:560px;}
+  .s06 .clause-num{color:var(--cream); opacity:0.6; display:block; margin-bottom:16px;}
+  .s06 h2{font-family:'Migra',serif; font-weight:700; font-size:clamp(22px,3.2vw,32px); margin-bottom:18px;}
+  .s06 .fact{font-family:'Fragment Mono',monospace; font-size:12px; opacity:0.75; letter-spacing:0.02em;}
+
+  /* ---- §07 full-bleed close ---- */
+  .s07{position:relative; min-height:100vh; display:flex; align-items:flex-end;}
+  .s07 .placeholder{position:absolute; inset:0;}
+  .s07 .veil{position:absolute; inset:0; background:linear-gradient(0deg, rgba(16,18,16,0.75), rgba(16,18,16,0.05) 55%);}
+  .s07 .content{position:relative; width:100%; padding:clamp(24px,5vw,60px); display:flex; justify-content:space-between; align-items:flex-end; flex-wrap:wrap; gap:24px;}
+  .s07 h2{font-family:'Migra',serif; font-weight:700; color:#F1F0EA; font-size:clamp(24px,3.6vw,40px); max-width:12em;}
+  .s07 .facts{font-family:'Fragment Mono',monospace; font-size:12px; color:#eae6da; opacity:0.8; line-height:1.9;}
+
+  /* ---- footer ---- */
+  .site-footer{
+    border-top:1px solid var(--line);
+    padding:clamp(24px,5vw,40px) clamp(20px,4vw,40px);
+    display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:16px;
+  }
+  .site-footer .footer-mark{font-family:'Migra',serif; font-weight:700; font-size:16px;}
+  .site-footer .footer-links{display:flex; gap:20px; font-family:'Fragment Mono',monospace; font-size:11px; color:var(--muted);}
+  .site-footer .footer-links a{color:var(--ink); text-decoration:none;}
+  .site-footer .footer-links a:hover{text-decoration:underline;}
+  .site-footer .footer-copy{font-family:'Fragment Mono',monospace; font-size:11px; color:var(--muted);}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="topnav-mark" href="#hero">SAVVA</a>
+  <div class="topnav-links">
+    <a href="#s03">Кофе</a>
+    <a href="#s04">Место</a>
+    <a href="#s05">Меню</a>
+    <a href="#s06">Визит</a>
+  </div>
+  <a class="topnav-cta" href="https://www.instagram.com/savva_cafe/" target="_blank" rel="noopener">Instagram</a>
+</nav>
+
+<section class="hero" id="hero">
+  <div class="split">
+    <div class="text-col">
+      <div class="clause-num reveal">§01</div>
+      <div class="clause-block reveal">
+        <h1>Кофе здесь не сервис. Это позиция.</h1>
+      </div>
+      <a class="fill-btn reveal" href="#s05">
+        <span class="fill"></span>
+        <span class="label">Смотреть, что в работе</span>
+      </a>
+    </div>
+    <div class="image-col">
+      <img data-variant="01" class="active" src="foto/626292371_18057275822342849_6177173044966868989_n.jpg" style="object-position:62% 60%;" alt="">
+      <img data-variant="02" src="foto/600854154_17981589272929325_7405325310326216018_n.jpg" style="object-position:58% 45%;" alt="">
+      <img data-variant="03" src="foto/623352790_18067923083207509_1092006561960030952_n.jpg" style="object-position:50% 55%;" alt="">
+    </div>
+  </div>
+</section>
+
+<div class="settings-panel">
+  <span class="label">ФОН</span>
+  <div class="opts">
+    <button data-variant="01" class="active">01</button>
+    <button data-variant="02">02</button>
+    <button data-variant="03">03</button>
+  </div>
+</div>
+
+<section class="s02" id="s02">
+  <img class="s02-photo" src="foto/799848426_18015550742929325_2004793924333812957_n.jpg" alt="" style="object-position:55% 32%;">
+  <div class="veil"></div>
+  <div class="content">
+    <span class="clause-num reveal">§02</span>
+    <h2 class="reveal">За этим столом можно провести весь день. Мы для этого его и поставили.</h2>
+  </div>
+</section>
+
+<section class="s03" id="s03">
+  <div class="split">
+    <div class="text-col">
+      <span class="clause-num reveal">§03</span>
+      <div class="clause-block reveal">
+        <h2>Зерно обжаривается под то, что происходит в чашке, а не наоборот.</h2>
+      </div>
+    </div>
+    <div class="image-col">
+      <div class="placeholder">
+        <div class="tag">ФОТО: обжаренные зёрна крупным планом или пролив в стакан</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="s04" id="s04">
+  <div class="row-head">
+    <span class="clause-num reveal">§04</span>
+    <h2 class="reveal">Место работает в темпе города: заходят на пять минут, остаются на пять часов.</h2>
+  </div>
+  <div class="tiles">
+    <div class="placeholder"><div class="tag">ФОТО: угол зала</div></div>
+    <div class="placeholder"><div class="tag">ФОТО: свет и растения</div></div>
+    <div class="placeholder"><div class="tag">ФОТО: деталь стойки</div></div>
+  </div>
+</section>
+
+<section class="s05" id="s05">
+  <span class="clause-num reveal">§05</span>
+  <h2 class="reveal">В работе сегодня.</h2>
+
+  <div class="catalog reveal">
+    <div class="catalog-viewport">
+      <div class="catalog-track">
+        <button class="catalog-card" data-index="0" type="button">
+          <span class="n">01</span>
+          <span class="label">Эспрессо и фильтр</span>
+        </button>
+        <button class="catalog-card" data-index="1" type="button">
+          <span class="n">02</span>
+          <span class="label">Напитки со льдом</span>
+        </button>
+        <button class="catalog-card" data-index="2" type="button">
+          <span class="n">03</span>
+          <span class="label">Сезонное блюдо дня</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="catalog-nav">
+      <button class="catalog-prev" type="button" aria-label="Предыдущая карточка">Пред.</button>
+      <div class="catalog-dots">
+        <button data-index="0" type="button" aria-label="Карточка 1"></button>
+        <button data-index="1" type="button" aria-label="Карточка 2"></button>
+        <button data-index="2" type="button" aria-label="Карточка 3"></button>
+      </div>
+      <button class="catalog-next" type="button" aria-label="Следующая карточка">След.</button>
+    </div>
+
+    <div class="catalog-detail">
+      <p class="catalog-desc" data-index="0">Обжарка ротируется по сезону, метод варки подбирается под конкретное зерно.</p>
+      <p class="catalog-desc" data-index="1" hidden>Правильно работают всё лето: от классического айс-латте до фильтр-кофе со льдом.</p>
+      <p class="catalog-desc" data-index="2" hidden>Меняется без предупреждения. Спросите на месте, что сегодня.</p>
+      <a class="catalog-cta" href="https://www.instagram.com/savva_cafe/" target="_blank" rel="noopener">
+        <span class="cta-fill"></span>
+        <span class="cta-text">Написать в Instagram</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="s06" id="s06">
+  <div class="content">
+    <span class="clause-num reveal">§06</span>
+    <h2 class="reveal">Медина.</h2>
+    <div class="fact reveal">ЗАПОЛНИТЬ: адрес и часы работы</div>
+  </div>
+</section>
+
+<section class="s07" id="s07">
+  <div class="placeholder">
+    <div class="tag">ФОТО: витрина или вход в кофейню в сумерках</div>
+  </div>
+  <div class="veil"></div>
+  <div class="content">
+    <h2 class="reveal">Каждое утро начинается заново. Это утро начинается в SAVVA.</h2>
+    <div class="facts reveal">SAVVA<br>Медина<br>@savva_cafe</div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <span class="footer-mark">SAVVA</span>
+  <div class="footer-links">
+    <a href="https://www.instagram.com/savva_cafe/" target="_blank" rel="noopener">Instagram</a>
+    <span>Медина</span>
+  </div>
+  <span class="footer-copy">© SAVVA</span>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('in-view'); });
+  }, {threshold:0.35});
+  document.querySelectorAll('.hero,.s02,.s03,.s04,.s05,.s06,.s07').forEach(s=>io.observe(s));
+
+  /* scroll-driven "dive into the shot": the hero photo slowly zooms
+     and drifts forward as the hero scrolls out of view */
+  const heroSection = document.getElementById('hero');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let diveTicking = false;
+  function updateHeroDive(){
+    if(reduceMotion) return;
+    const rect = heroSection.getBoundingClientRect();
+    const vh = window.innerHeight || 1;
+    const progress = Math.min(Math.max(-rect.top / vh, 0), 1);
+    const activeImg = document.querySelector('.hero .image-col img.active');
+    if(activeImg){
+      const scale = 1 + progress * 0.22;
+      const drift = progress * -18;
+      activeImg.style.transform = `scale(${scale.toFixed(3)}) translateY(${drift.toFixed(1)}px)`;
+    }
+    diveTicking = false;
+  }
+  window.addEventListener('scroll', ()=>{
+    if(!diveTicking){ requestAnimationFrame(updateHeroDive); diveTicking = true; }
+  }, {passive:true});
+  window.addEventListener('resize', updateHeroDive);
+
+  const heroPhotos = document.querySelectorAll('.hero .image-col img');
+  const panelButtons = document.querySelectorAll('.settings-panel button');
+  function setHeroVariant(v){
+    heroPhotos.forEach(img=>img.classList.toggle('active', img.dataset.variant===v));
+    panelButtons.forEach(b=>b.classList.toggle('active', b.dataset.variant===v));
+    try{ localStorage.setItem('savva-hero-photo', v); }catch(e){}
+    updateHeroDive();
+  }
+  panelButtons.forEach(b=>b.addEventListener('click', ()=>setHeroVariant(b.dataset.variant)));
+  let savedVariant = null;
+  try{ savedVariant = localStorage.getItem('savva-hero-photo'); }catch(e){}
+  if(savedVariant) setHeroVariant(savedVariant);
+  updateHeroDive();
+
+  /* §05 catalog: paged cards, description + request button underneath */
+  (function(){
+    const track = document.querySelector('.catalog-track');
+    const cards = document.querySelectorAll('.catalog-card');
+    const dots = document.querySelectorAll('.catalog-dots button');
+    const descs = document.querySelectorAll('.catalog-desc');
+    const prevBtn = document.querySelector('.catalog-prev');
+    const nextBtn = document.querySelector('.catalog-next');
+    if(!track) return;
+
+    let active = 0;
+    const count = cards.length;
+
+    function render(){
+      track.style.transform = `translateX(${active * -100}%)`;
+      dots.forEach(d=>d.classList.toggle('active', Number(d.dataset.index)===active));
+      descs.forEach(p=>{ p.hidden = Number(p.dataset.index)!==active; });
+      prevBtn.disabled = active===0;
+      nextBtn.disabled = active===count-1;
+    }
+
+    function goTo(i){
+      active = Math.min(Math.max(i,0), count-1);
+      render();
+    }
+
+    cards.forEach(c=>c.addEventListener('click', ()=>goTo(Number(c.dataset.index))));
+    dots.forEach(d=>d.addEventListener('click', ()=>goTo(Number(d.dataset.index))));
+    prevBtn.addEventListener('click', ()=>goTo(active-1));
+    nextBtn.addEventListener('click', ()=>goTo(active+1));
+
+    let touchStartX = null;
+    track.addEventListener('touchstart', e=>{ touchStartX = e.touches[0].clientX; }, {passive:true});
+    track.addEventListener('touchend', e=>{
+      if(touchStartX===null) return;
+      const dx = e.changedTouches[0].clientX - touchStartX;
+      if(Math.abs(dx) > 40) goTo(active + (dx < 0 ? 1 : -1));
+      touchStartX = null;
+    }, {passive:true});
+
+    render();
+  })();
+</script>
+
+</body>
+</html>
